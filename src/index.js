@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 //Cấu hình browser router
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import UseStateDemo from './pages/HooksDemo/UseStateDemo/UseStateDemo';
 import UseEffectDemo from './pages/HooksDemo/UseEffectDemo/UseEffectDemo';
 import UseCallBackDemo from './pages/HooksDemo/UseCallBackDemo/UseCallBackDemo';
@@ -24,10 +24,21 @@ import DemoUseRoute from './pages/DemoUseRoute/DemoUseRoute';
 import DemoAnimation from './pages/DemoAnimation/DemoAnimation';
 import Login from './pages/Login/Login';
 
+//Tạo ra 1 biến để quản lý chuyển hướng trang
+import { createBrowserHistory } from 'history';
+import { unstable_HistoryRouter as HistoryRouter } from "react-router-dom";
+import DemoHoc from './pages/DemoHoc/DemoHoc';
+import AdminTemplate from './templates/AdminTemplate';
+import UserManagement from './pages/Admin/UserManagement/UserManagement';
+import ProductManagement from './pages/Admin/ProductManagement/ProductManagement';
+
+export const history = createBrowserHistory();
+
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <Provider store={store}>
-    <BrowserRouter>
+    <HistoryRouter history={history}>
       <Routes>
         <Route path='' element={<App />}>
           <Route index element={<Home />} />
@@ -49,9 +60,19 @@ root.render(
 
           <Route path='profile' element={<Profile />}></Route>
 
+          <Route path='demohoc' element={<DemoHoc />}></Route>
+
+
+          <Route path='*' element={<Navigate to={'/'} />} > </Route>
         </Route>
+        <Route path='users' element={<AdminTemplate component={UserManagement} />} />
+        <Route path='products' element={<AdminTemplate component={ProductManagement} />} />
+
       </Routes>
-    </BrowserRouter>
+
+
+
+    </HistoryRouter>
   </Provider>
 );
 

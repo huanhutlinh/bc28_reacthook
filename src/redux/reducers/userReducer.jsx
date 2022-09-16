@@ -1,9 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit'
 import axios from 'axios';
-import { ACCESS_TOKEN, getStore, getStoreJSON, setCookie, setStore, setStoreJSON, USER_LOGIN } from '../../util/config';
+import { history } from '../../index';
+import { ACCESS_TOKEN, getStore, getStoreJSON, http, setCookie, setStore, setStoreJSON, USER_LOGIN } from '../../util/config';
 
 const initialState = {
-    userLogin: getStoreJSON(USER_LOGIN)
+    userLogin: getStoreJSON(USER_LOGIN) //null
 }
 
 const userReducer = createSlice({
@@ -28,11 +29,7 @@ export const signinApi = (userLogin) => { //userLogin = {email:'',password}
 
     return async dispatch => {
         try {
-            let result = await axios({
-                url: 'https://shop.cyberlearn.vn/api/Users/signin',
-                method: 'POST',
-                data: userLogin //{email:'',password:''}
-            });
+            let result = await http.post('/Users/signin',userLogin);
 
             //thành công
             //Lưu lại token
@@ -45,12 +42,16 @@ export const signinApi = (userLogin) => { //userLogin = {email:'',password}
             //Đưa lên userLogin thành công lên reducer
             //result.data.content = {email:'',accessToken:''}
             const action = setUserLoginAction(result.data.content);
-        
-            dispatch(action)
+            dispatch(action);
+
+            history.push('/profile');
 
 
         } catch (err) {
             console.log({err});
+            alert('Tài khoản mật khẩu không đúng !')
+            history.push('/');
+
         }
     }
 }
@@ -61,21 +62,16 @@ export const getProfileApi = ()=>{
 
     return async dispatch => {
         try {
-            let result = await axios({
-                url:'https://shop.cyberlearn.vn/api/Users/getProfile',
-                method: 'POST',
-                // data:'Dữ liệu người dùng nhập, chọn, thay đổi'
-                headers: {
-                    Authorization: `Bearer ${getStore(ACCESS_TOKEN)}`
-                }
-            });
+            let result = await http.post('/users/getprofile');
+
 
             console.log('Kết quả',result.data.content)
             //Tạo ra actioncreator => dispatch lên redux
             const action = setUserLoginAction(result.data.content);
-
             dispatch(action);
         }catch(err){
+            alert('Đăng nhập để vào trang này !');
+            history.push('/login');
             console.log({err})
         }
     } 
